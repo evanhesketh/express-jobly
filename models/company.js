@@ -2,7 +2,10 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate, sqlForFilteringCriteria } = require("../helpers/sql");
+const {
+  sqlForPartialUpdate,
+  sqlForFilteringCriteria,
+} = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -73,10 +76,8 @@ class Company {
    *
    */
   static async findByFilters(filters) {
-    const {filterCols, values} = sqlForFilteringCriteria(filters);
-
-    const querySql =
-      `SELECT handle,
+    const { filterCols, values } = sqlForFilteringCriteria(filters);
+    const querySql = `SELECT handle,
               name,
               description,
               num_employees AS "numEmployees",
@@ -86,11 +87,8 @@ class Company {
           ORDER BY name`;
 
     const result = await db.query(querySql, [...values]);
+    console.log(result, "RESULTTTT");
     const companies = result.rows;
-
-    if (companies.length === 0) {
-      throw new NotFoundError('No companies found matching provided filters');
-    }
 
     return companies;
   }

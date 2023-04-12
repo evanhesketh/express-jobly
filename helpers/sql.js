@@ -31,11 +31,6 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
     (colName, idx) => `"${jsToSql[colName] || colName}"=$${idx + 1}`
   );
 
-  console.log("sqlForPartial", {
-    setCols: cols.join(", "),
-    values: Object.values(dataToUpdate),
-  });
-
   return {
     setCols: cols.join(", "),
     values: Object.values(dataToUpdate),
@@ -68,17 +63,18 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
  */
 
 function sqlForFilteringCriteria(dataToFilterBy) {
-  const name = dataToFilterBy.nameLike || '';
+  const name = dataToFilterBy.nameLike || "";
   const minEmployees = dataToFilterBy.minEmployees || 0;
-  const maxEmployees = dataToFilterBy.maxEmployees || 1000000000000;
+  const maxEmployees = dataToFilterBy.maxEmployees || 1000000000;
 
   if (minEmployees > maxEmployees) {
     throw new BadRequestError("minEmployees must be less than maxEmployees");
   }
 
-  return {filterCols: `"name" ILIKE $1 AND "num_employees">=$2 AND "num_employees"<=$3`,
-          values: [`%${name}%`, minEmployees, maxEmployees]
-  }
+  return {
+    filterCols: `"name" ILIKE $1 AND "num_employees">=$2 AND "num_employees"<=$3`,
+    values: [`%${name}%`, minEmployees, maxEmployees],
+  };
 }
 
 // SELECT handle, name, description, num_employees AS "numEmployees", logo_url AS "logoUrl"

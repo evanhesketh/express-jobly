@@ -53,11 +53,11 @@ describe("Creates SQL filter for filtered search", function () {
   });
   test("works when parameters are missing", function () {
     const dataToUpdate = {
-      minEmployees: 500
+      minEmployees: 500,
     };
     expect(sqlForFilteringCriteria(dataToUpdate)).toEqual({
       filterCols: `"name" ILIKE $1 AND "num_employees">=$2 AND "num_employees"<=$3`,
-      values: ["%%", 500, 1000000000000]
+      values: ["%%", 500, 1000000000],
     });
   });
 });
