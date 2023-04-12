@@ -67,7 +67,11 @@ function sqlForFilteringCriteria(dataToFilterBy) {
   const minEmployees = dataToFilterBy.minEmployees || 0;
   const maxEmployees = dataToFilterBy.maxEmployees || 1000000000;
 
-  if (minEmployees > maxEmployees) {
+  if (isNaN(Number(minEmployees)) || isNaN(Number(maxEmployees))) {
+    throw new BadRequestError(
+      "MinEmployees and MaxEmployees must be type integer"
+    );
+  } else if (minEmployees > maxEmployees) {
     throw new BadRequestError("minEmployees must be less than maxEmployees");
   }
 

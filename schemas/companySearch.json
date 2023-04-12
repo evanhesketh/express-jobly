@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://our.company.com/companySearch.schema.json",
+  "type": "object",
+  "properties": {
+    "nameLike": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 30
+    },
+    "minEmployees": {
+      "type": "string",
+      "minimum": 0
+    },
+    "maxEmployees": {
+      "type": "string",
+      "maximum": 1000000000
+    }
+  },
+  "additionalProperties": false
+}
