@@ -17,7 +17,7 @@ const { BadRequestError } = require("../expressError");
  * {firstName: "first_name", age: "age"})
  *
  *  RETURNS: {
- *   setCols: `"first_name"="$1", "age"="2"`,
+ *   setCols: `"first_name"=$1, "age"=$2`,
  *   values: ['Aliya', 32]
  * }
  *  */
@@ -30,6 +30,11 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   const cols = keys.map(
     (colName, idx) => `"${jsToSql[colName] || colName}"=$${idx + 1}`
   );
+
+  console.log("sqlForPartial", {
+    setCols: cols.join(", "),
+    values: Object.values(dataToUpdate),
+  })
 
   return {
     setCols: cols.join(", "),
