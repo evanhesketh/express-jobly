@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+const { sqlForPartialUpdate, sqlForFilteringCriteria } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -60,6 +60,39 @@ class Company {
            ORDER BY name`
     );
     return companiesRes.rows;
+  }
+
+  /**
+   * Accepts object {nameLike: "sons", "minEmployees": 300, "maxEmployees": 800}
+   *
+   * Finds companies with filtering criteria.
+   *
+   * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
+   *
+   * TODO: question - prefer error, string, object to indicate no users found
+   *
+   */
+  static async findByFilters(filters) {
+    const {filterCols, values} = sqlForFilteringCriteria(filters);
+
+    const querySql =
+      `SELECT handle,
+              name,
+              description,
+              num_employees AS "numEmployees",
+              logo_url AS "logoUrl"
+          FROM companies
+          WHERE ${filterCols}
+          ORDER BY name`;
+
+    const result = await db.query(querySql, [...values]);
+    const companies = result.rows;
+
+    if (companies.length === 0) {
+      throw new NotFoundError('No companies found matching provided filters');
+    }
+
+    return companies;
   }
 
   /** Given a company handle, return data about company.

@@ -1,4 +1,4 @@
-const { sqlForPartialUpdate } = require("./sql");
+const { sqlForPartialUpdate, sqlForFilteringCriteria } = require("./sql");
 const { BadRequestError } = require("../expressError");
 
 describe("Creates SQL for partial update", function () {
@@ -28,13 +28,13 @@ describe("Creates SQL for partial update", function () {
 describe("Creates SQL filter for filtered search", function () {
   test("works", function () {
     const dataToUpdate = {
-      nameLike: "Sons",
+      nameLike: "sons",
       minEmployees: 500,
       maxEmployees: 800,
     };
     expect(sqlForFilteringCriteria(dataToUpdate)).toEqual({
       filterCols: `"name" ILIKE $1 AND "num_employees">=$2 AND "num_employees"<=$3`,
-      values: ["%SONS%", 500, 800],
+      values: ["%sons%", 500, 800],
     });
   });
   test("fails when minEmployees parameter is greater than maxEmployees parameters", function () {
@@ -50,5 +50,14 @@ describe("Creates SQL filter for filtered search", function () {
     } catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();
     }
+  });
+  test("works when parameters are missing", function () {
+    const dataToUpdate = {
+      minEmployees: 500
+    };
+    expect(sqlForFilteringCriteria(dataToUpdate)).toEqual({
+      filterCols: `"name" ILIKE $1 AND "num_employees">=$2 AND "num_employees"<=$3`,
+      values: ["%%", 500, 1000000000000]
+    });
   });
 });
