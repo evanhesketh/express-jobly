@@ -25,7 +25,30 @@ describe("Creates SQL for partial update", function () {
   });
 });
 
-// function sqlForFiltertingCriteria(dataToFilterBy, jsToSql) {
+describe("Creates SQL filter for filtered search", function () {
+  test("works", function () {
+    const dataToUpdate = {
+      nameLike: "Sons",
+      minEmployees: 500,
+      maxEmployees: 800,
+    };
+    expect(sqlForFilteringCriteria(dataToUpdate)).toEqual({
+      filterCols: `"name" ILIKE $1 AND "num_employees">=$2 AND "num_employees"<=$3`,
+      values: ["%SONS%", 500, 800],
+    });
+  });
+  test("fails when minEmployees parameter is greater than maxEmployees parameters", function () {
+    const dataToUpdate = {
+      nameLike: "Sons",
+      minEmployees: 800,
+      maxEmployees: 500,
+    };
 
-//   return {}
-// }
+    try {
+      sqlForFilteringCriteria(dataToUpdate);
+      throw new Error("fail test, you shouldn't get here");
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+});
