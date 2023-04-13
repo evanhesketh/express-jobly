@@ -94,7 +94,7 @@ describe("GET /companies", function () {
       ],
     });
   });
-  //TODO: question: instead of long query string, is there a better way?
+  // TODO: question: instead of long query string, is there a better way? ---- Can write request(app).get(----).query({keys+vals})
   test("gets companies with filter criteria pass in query string", async function () {
     const resp = await request(app).get(
       "/companies/?nameLike=c&minEmployees=3&maxEmployees=800"

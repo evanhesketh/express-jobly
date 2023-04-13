@@ -51,7 +51,6 @@ class Company {
    *
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
-  //TODO: this function is obsolete (but left in currently for testing)
   static async findAll() {
     const companiesRes = await db.query(
       `SELECT handle,
@@ -73,7 +72,8 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    *
    * TODO: question - prefer error, string, object to indicate no users found
-   *
+   * TODO: can refactor and combine with findAll by passing in entire where clause in your
+   * helper function.
    */
   static async findByFilters(filters) {
     const { filterCols, values } = sqlForFilteringCriteria(filters);

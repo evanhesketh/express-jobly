@@ -27,6 +27,7 @@ describe("Creates SQL for partial update", function () {
 
 describe("Creates SQL filter for filtered search", function () {
   test("works", function () {
+    // change to dataToFilterBy
     const dataToUpdate = {
       nameLike: "sons",
       minEmployees: 500,
@@ -38,6 +39,7 @@ describe("Creates SQL filter for filtered search", function () {
     });
   });
   test("fails when minEmployees parameter is greater than maxEmployees parameters", function () {
+    // Change to dataToFilterBy
     const dataToUpdate = {
       nameLike: "Sons",
       minEmployees: 800,
@@ -52,6 +54,7 @@ describe("Creates SQL filter for filtered search", function () {
     }
   });
   test("works when parameters are missing", function () {
+    // See above...
     const dataToUpdate = {
       minEmployees: 500,
     };

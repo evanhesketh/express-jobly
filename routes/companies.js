@@ -54,6 +54,9 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 router.get("/", async function (req, res, next) {
   let { minEmployees, maxEmployees } = req.query;
 
+  // Create new object with all keys and values from the query string, and then pass it into the
+  // jsonschema validator.
+
   if (minEmployees === " " || maxEmployees === " ") {
     throw new BadRequestError(
       "minEmployees and maxEmployees can not be an empty string."

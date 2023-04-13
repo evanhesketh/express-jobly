@@ -37,7 +37,7 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   };
 }
 
-/** Accepts two parameters: dataToFilterBy, an object sent from the route.
+/** Accepts one parameter: dataToFilterBy, an object sent from the route.
  *
  *  Allows us to filter search results by optional filtering criteria from the user.
  *  nameLike: ILIKE - nameLike
