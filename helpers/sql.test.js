@@ -56,15 +56,27 @@ describe("Creates SQL filter for filtered search", function () {
       minEmployees: 500,
     };
     expect(sqlForFilteringCriteria(dataToUpdate)).toEqual({
-      filterCols: `"name" ILIKE $1 AND "num_employees">=$2 AND "num_employees"<=$3`,
-      values: ["%%", 500, 1000000000],
+      filterCols: `"num_employees">=$1`,
+      values: [500],
     });
   });
 
-  test("fails when minEmployees or maxEmployees is not a number", function () {
+  test("fails when minEmployees is not a number", function () {
     const dataToUpdate = {
-      minEmployees: "notANumber"
+      minEmployees: "notANumber",
+    };
+    try {
+      sqlForFilteringCriteria(dataToUpdate);
+      throw new Error("fail test, you shouldn't get here");
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
     }
+  });
+
+  test("Fails when maxEmployees is not of type integer", function () {
+    const dataToUpdate = {
+      maxEmployees: "notANumber",
+    };
     try {
       sqlForFilteringCriteria(dataToUpdate);
       throw new Error("fail test, you shouldn't get here");

@@ -82,32 +82,34 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 // }
 
 function sqlForFilteringCriteria(dataToFilterBy) {
-  const name = dataToFilterBy.nameLike
+  const name = dataToFilterBy.nameLike;
   const minEmployees = dataToFilterBy.minEmployees;
   const maxEmployees = dataToFilterBy.maxEmployees;
   const filterCols = [];
   const values = [];
 
-  if (isNaN(Number(minEmployees)) || isNaN(Number(maxEmployees))) {
-    throw new BadRequestError(
-      "MinEmployees and MaxEmployees must be type integer"
-    );
-  } else if (minEmployees > maxEmployees) {
+  if (minEmployees > maxEmployees) {
     throw new BadRequestError("minEmployees must be less than maxEmployees");
   }
 
   if (name) {
-    filterCols.push(`name ILIKE `);
+    filterCols.push(`"name" ILIKE `);
     values.push(`%${name}%`);
   }
 
   if (minEmployees) {
-    filterCols.push(`num_employees>=`);
+    if (isNaN(Number(minEmployees))) {
+      throw new BadRequestError("MinEmployees must be of type integer");
+    }
+    filterCols.push(`"num_employees">=`);
     values.push(minEmployees);
   }
 
   if (maxEmployees) {
-    filterCols.push(`num_employees<=`);
+    if (isNaN(Number(maxEmployees))) {
+      throw new BadRequestError("maxEmployees must be of type integer");
+    }
+    filterCols.push(`"num_employees"<=`);
     values.push(maxEmployees);
   }
 
@@ -115,10 +117,8 @@ function sqlForFilteringCriteria(dataToFilterBy) {
     filterCols[i] += `$${i + 1}`;
   }
 
-  console.log("filterCols joined", filterCols.join(' AND '))
-  console.log("object VALUES", Object.values(dataToFilterBy))
   return {
-    filterCols: filterCols.join(' AND '),
+    filterCols: filterCols.join(" AND "),
     values: [...values],
   };
 }

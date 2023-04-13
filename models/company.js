@@ -77,6 +77,7 @@ class Company {
    */
   static async findByFilters(filters) {
     const { filterCols, values } = sqlForFilteringCriteria(filters);
+    console.log(filterCols, "TEST TEST TEST");
     const querySql = `SELECT handle,
               name,
               description,

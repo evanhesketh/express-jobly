@@ -49,18 +49,23 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  const validator = jsonschema.validate(req.query, companySearchSchema, {
+  if (Object.keys(req.query).length > 0) {
+    const validator = jsonschema.validate(req.query, companySearchSchema, {
       required: true,
-  });
+    });
 
-  if (!validator.valid) {
+    if (!validator.valid) {
       const errs = validator.errors.map((e) => e.stack);
       throw new BadRequestError(errs);
     }
-  const companies = await Company.findByFilters(req.query);
+    const companies = await Company.findByFilters(req.query);
+
+    return res.json({ companies });
+  }
+
+  const companies = await Company.findAll();
 
   return res.json({ companies });
-
 });
 
 /** GET /[handle]  =>  { company }
