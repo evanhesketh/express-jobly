@@ -60,4 +60,16 @@ describe("Creates SQL filter for filtered search", function () {
       values: ["%%", 500, 1000000000],
     });
   });
+
+  test("fails when minEmployees or maxEmployees is not a number", function () {
+    const dataToUpdate = {
+      minEmployees: "notANumber"
+    }
+    try {
+      sqlForFilteringCriteria(dataToUpdate);
+      throw new Error("fail test, you shouldn't get here");
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
 });

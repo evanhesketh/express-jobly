@@ -51,7 +51,7 @@ class Company {
    *
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
-
+  //TODO: this function is obsolete (but left in currently for testing)
   static async findAll() {
     const companiesRes = await db.query(
       `SELECT handle,

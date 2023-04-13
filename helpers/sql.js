@@ -62,10 +62,31 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
  *
  */
 
+// function sqlForFilteringCriteria(dataToFilterBy) {
+//   const name = dataToFilterBy.nameLike || "";
+//   const minEmployees = dataToFilterBy.minEmployees || 0;
+//   const maxEmployees = dataToFilterBy.maxEmployees || 1000000000;
+
+//   if (isNaN(Number(minEmployees)) || isNaN(Number(maxEmployees))) {
+//     throw new BadRequestError(
+//       "MinEmployees and MaxEmployees must be type integer"
+//     );
+//   } else if (minEmployees > maxEmployees) {
+//     throw new BadRequestError("minEmployees must be less than maxEmployees");
+//   }
+
+//   return {
+//     filterCols: `"name" ILIKE $1 AND "num_employees">=$2 AND "num_employees"<=$3`,
+//     values: [`%${name}%`, minEmployees, maxEmployees],
+//   };
+// }
+
 function sqlForFilteringCriteria(dataToFilterBy) {
-  const name = dataToFilterBy.nameLike || "";
-  const minEmployees = dataToFilterBy.minEmployees || 0;
-  const maxEmployees = dataToFilterBy.maxEmployees || 1000000000;
+  const name = dataToFilterBy.nameLike
+  const minEmployees = dataToFilterBy.minEmployees;
+  const maxEmployees = dataToFilterBy.maxEmployees;
+  const filterCols = [];
+  const values = [];
 
   if (isNaN(Number(minEmployees)) || isNaN(Number(maxEmployees))) {
     throw new BadRequestError(
@@ -75,9 +96,30 @@ function sqlForFilteringCriteria(dataToFilterBy) {
     throw new BadRequestError("minEmployees must be less than maxEmployees");
   }
 
+  if (name) {
+    filterCols.push(`name ILIKE `);
+    values.push(`%${name}%`);
+  }
+
+  if (minEmployees) {
+    filterCols.push(`num_employees>=`);
+    values.push(minEmployees);
+  }
+
+  if (maxEmployees) {
+    filterCols.push(`num_employees<=`);
+    values.push(maxEmployees);
+  }
+
+  for (let i = 0; i < filterCols.length; i++) {
+    filterCols[i] += `$${i + 1}`;
+  }
+
+  console.log("filterCols joined", filterCols.join(' AND '))
+  console.log("object VALUES", Object.values(dataToFilterBy))
   return {
-    filterCols: `"name" ILIKE $1 AND "num_employees">=$2 AND "num_employees"<=$3`,
-    values: [`%${name}%`, minEmployees, maxEmployees],
+    filterCols: filterCols.join(' AND '),
+    values: [...values],
   };
 }
 
