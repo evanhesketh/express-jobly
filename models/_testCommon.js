@@ -31,7 +31,7 @@ async function commonBeforeAll() {
     ]
   );
   //TODO: should we be returning something here???
-  await db.query(
+  const results = await db.query(
     `
     INSERT INTO jobs(title,
                       salary,
@@ -41,6 +41,8 @@ async function commonBeforeAll() {
             ('j2', 150000, 0.95, 'c2')
     RETURNING id`
   );
+  const job1Id = result.rows[0].id;
+  const job2Id = results.rows[1].id;
 }
 
 async function commonBeforeEach() {

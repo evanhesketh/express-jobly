@@ -1,14 +1,14 @@
 "use strict";
 
 const db = require("../db.js");
-const { BadRequestError, NotFoundError } = require("../expressError");
+const { BadRequestError, NotFoundError } = require("../expressError.js");
 const Job = require("./job.js");
 const {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-} = require("./_testCommon");
+} = require("./_testCommon.js");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -21,8 +21,8 @@ describe("create", function () {
   const newJob = {
     title: "new",
     salary: 90000,
-    equity: 0.90,
-    company_handle: 'c1'
+    equity: 0.9,
+    company_handle: "c1",
   };
 
   test("works", async function () {
@@ -40,9 +40,9 @@ describe("create", function () {
         id: jobId,
         title: "new",
         salary: 90000,
-        equity: 0.90,
-        company_handle: 'c1'
-      }
+        equity: 0.9,
+        company_handle: "c1",
+      },
     ]);
   });
 
@@ -64,18 +64,19 @@ describe("findAll", function () {
     const jobs = await Job.findAll();
     expect(jobs).toEqual([
       {
-        title: 'j1',
+        title: "j1",
         salary: 100000,
         equity: 0.98,
-        company_handle: 'c1'
+        company_handle: "c1",
       },
 
       {
-        title: 'j2',
+        id: job2Id,
+        title: "j2",
         salary: 150000,
         equity: 0.95,
-        company_handle: 'c2'
-      }
+        company_handle: "c2",
+      },
     ]);
   });
 });
@@ -85,26 +86,26 @@ describe("findAll", function () {
 describe("findByFilters", function () {
   test("works", async function () {
     const filters = {
-      title: '1',
+      title: "1",
       minSalary: 80000,
-      hasEquity: true
+      hasEquity: true,
     };
     const jobs = await Job.findByFilters(filters);
 
     expect(jobs).toEqual([
       {
-        title: 'j1',
+        title: "j1",
         salary: 100000,
         equity: 0.98,
-        company_handle: 'c1'
-      }
+        company_handle: "c1",
+      },
     ]);
   });
   test("Returns empty array if no matching jobs", async function () {
     const filters = {
-      title: '1',
+      title: "1",
       minSalary: 80000,
-      hasEquity: false
+      hasEquity: false,
     };
     const jobs = await Job.findByFilters(filters);
 
@@ -112,31 +113,31 @@ describe("findByFilters", function () {
   });
   test("Works if we only pass in certain parameters", async function () {
     const filters = {
-      title: 'j1'
+      title: "j1",
     };
     const jobs = await Job.findByFilters(filters);
 
     expect(jobs).toEqual([
       {
-        title: 'j1',
+        title: "j1",
         salary: 100000,
         equity: 0.98,
-        company_handle: 'c1'
-      }
+        company_handle: "c1",
+      },
     ]);
   });
 });
 
 /************************************** get */
 
-describe("get", async function () {
+describe("get", function () {
   test("works", async function () {
-    const job = await Job.get(job2.id);
+    const job = await Job.get(job2Id);
     expect(job).toEqual({
-      title: 'j2',
+      title: "j2",
       salary: 150000,
       equity: 0.95,
-      company_handle: 'c2'
+      company_handle: "c2",
     });
   });
 
@@ -154,10 +155,10 @@ describe("get", async function () {
 
 describe("update", function () {
   const updateData = {
-    title: 'j2',
+    title: "j2",
     salary: 200000,
     equity: 0.95,
-    company_handle: 'c2'
+    company_handle: "c2",
   };
 
   test("works", async function () {
@@ -175,11 +176,11 @@ describe("update", function () {
     expect(result.rows).toEqual([
       {
         id: job2Id,
-        title: 'j2',
+        title: "j2",
         salary: 200000,
         equity: 0.95,
-        company_handle: 'c2'
-      }
+        company_handle: "c2",
+      },
     ]);
   });
 
@@ -187,7 +188,7 @@ describe("update", function () {
     const updateDataSetNulls = {
       salary: 200000,
       equity: 0.95,
-      company_handle: 'c2'
+      company_handle: "c2",
     };
 
     const job = await Job.update(job2Id, updateDataSetNulls);
@@ -204,10 +205,10 @@ describe("update", function () {
     expect(result.rows).toEqual([
       {
         id: job2Id,
-        title: 'j2',
+        title: "j2",
         salary: 200000,
         equity: 0.95,
-        company_handle: 'c2'
+        company_handle: "c2",
       },
     ]);
   });
@@ -230,22 +231,21 @@ describe("update", function () {
     }
   });
 
-  test("bad request when changing company handle to non existant company",
-    async function () {
-      const updateData = {
-        title: 'j2',
-        salary: 200000,
-        equity: 0.95,
-        company_handle: 'nope'
-      };
+  test("bad request when changing company handle to non existant company", async function () {
+    const updateData = {
+      title: "j2",
+      salary: 200000,
+      equity: 0.95,
+      company_handle: "nope",
+    };
 
-      try {
-        await Job.update(job2Id, updateData);
-        throw new Error("fail test, you shouldn't get here");
-      } catch (err) {
-        expect (err instanceof BadRequestError).toBeTruthy();
-      }
-    });
+    try {
+      await Job.update(job2Id, updateData);
+      throw new Error("fail test, you shouldn't get here");
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
 });
 
 /************************************** remove */
@@ -253,9 +253,7 @@ describe("update", function () {
 describe("remove", function () {
   test("works", async function () {
     await Job.remove(job2Id);
-    const res = await db.query(
-      `SELECT id FROM jobs WHERE id=${job2Id}`
-    );
+    const res = await db.query(`SELECT id FROM jobs WHERE id=${job2Id}`);
     expect(res.rows.length).toEqual(0);
   });
 
