@@ -23,7 +23,7 @@ const router = express.Router();
  * This returns the newly created user and an authentication token for them:
  *  {user: { username, firstName, lastName, email, isAdmin }, token }
  *
- * Authorization required: login
+ * Authorization required: login as admin
  **/
 
 router.post("/", ensureAdminLoggedIn, async function (req, res, next) {
@@ -44,7 +44,7 @@ router.post("/", ensureAdminLoggedIn, async function (req, res, next) {
  *
  * Returns list of all users.
  *
- * Authorization required: login
+ * Authorization required: login as admin
  **/
 
 router.get("/", ensureAdminLoggedIn, async function (req, res, next) {
@@ -56,18 +56,21 @@ router.get("/", ensureAdminLoggedIn, async function (req, res, next) {
  *
  * Returns { username, firstName, lastName, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: login as admin or as user being searched
  **/
 
 router.get("/:username", ensureLoggedIn, async function (req, res, next) {
   if (
-    res.locals.user.username !== req.params.username &&
-    res.locals.user.isAdmin !== true
+    res.locals.user.username === req.params.username ||
+    res.locals.user.isAdmin === true
   ) {
-    throw new UnauthorizedError();
+    const user = await User.get(req.params.username);
+    return res.json({ user });
+
   }
-  const user = await User.get(req.params.username);
-  return res.json({ user });
+
+  throw new UnauthorizedError();
+
 });
 
 /** PATCH /[username] { user } => { user }
@@ -77,44 +80,49 @@ router.get("/:username", ensureLoggedIn, async function (req, res, next) {
  *
  * Returns { username, firstName, lastName, email, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: login as admin or user being updated
  **/
 
 router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
-  const validator = jsonschema.validate(req.body, userUpdateSchema, {
-    required: true,
-  });
-  if (!validator.valid) {
-    const errs = validator.errors.map((e) => e.stack);
-    throw new BadRequestError(errs);
+  if (
+    res.locals.user.username === req.params.username ||
+    res.locals.user.isAdmin === true
+  ) {
+    const validator = jsonschema.validate(req.body, userUpdateSchema, {
+      required: true,
+    });
+
+    if (!validator.valid) {
+      const errs = validator.errors.map((e) => e.stack);
+      throw new BadRequestError(errs);
+    }
+
+    const user = await User.update(req.params.username, req.body);
+    return res.json({ user });
   }
 
-  if (
-    res.locals.user.username !== req.params.username &&
-    res.locals.user.isAdmin !== true
-  ) {
-    throw new UnauthorizedError();
-  }
-  const user = await User.update(req.params.username, req.body);
-  return res.json({ user });
+  throw new UnauthorizedError();
+
 });
 
 /** DELETE /[username]  =>  { deleted: username }
  *
- * Authorization required: login
+ * Authorization required: login as admin or as user being deleted
  **/
 
 router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
   console.log(res.locals.user, "USERRRR");
   console.log(req.params.username, "USERNAME");
   if (
-    res.locals.user.username !== req.params.username &&
-    res.locals.user.isAdmin !== true
+    res.locals.user.username === req.params.username ||
+    res.locals.user.isAdmin === true
   ) {
-    throw new UnauthorizedError();
+    await User.remove(req.params.username);
+    return res.json({ deleted: req.params.username });
   }
-  await User.remove(req.params.username);
-  return res.json({ deleted: req.params.username });
+
+  throw new UnauthorizedError();
+
 });
 
 module.exports = router;

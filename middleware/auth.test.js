@@ -5,8 +5,8 @@ const { UnauthorizedError } = require("../expressError");
 const {
   authenticateJWT,
   ensureLoggedIn,
+  ensureAdminLoggedIn,
 } = require("./auth");
-
 
 const { SECRET_KEY } = require("../config");
 const testJwt = jwt.sign({ username: "test", isAdmin: false }, SECRET_KEY);
@@ -45,7 +45,6 @@ describe("authenticateJWT", function () {
   });
 });
 
-
 describe("ensureLoggedIn", function () {
   test("works", function () {
     const req = {};
@@ -59,3 +58,25 @@ describe("ensureLoggedIn", function () {
     expect(() => ensureLoggedIn(req, res, next)).toThrowError();
   });
 });
+
+describe("ensureAdminLoggedIn", function () {
+  test("works", function () {
+    const req = {};
+    const res = { locals: { user: { username: "test", isAdmin: true } } };
+    ensureAdminLoggedIn(req, res, next);
+  });
+
+  test("unauth if no login", function () {
+    const req = {};
+    const res = { locals: {} };
+    expect(() => ensureAdminLoggedIn(req, res, next)).toThrowError();
+  });
+
+  test("unauth if logged in but not admin", function () {
+    const req = {};
+    const res = { locals: { user: { username: "test" } } };
+    expect(() => ensureAdminLoggedIn(req, res, next)).toThrowError();
+  });
+});
+
+//TODO: test if isAdmin is not set to true but a string of something else

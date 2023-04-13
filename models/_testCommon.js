@@ -30,6 +30,17 @@ async function commonBeforeAll() {
       await bcrypt.hash("password2", BCRYPT_WORK_FACTOR),
     ]
   );
+  //TODO: should we be returning something here???
+  await db.query(
+    `
+    INSERT INTO jobs(title,
+                      salary,
+                      equity,
+                      company_handle)
+    VALUES ('j1', 100000, 0.98, 'c1'),
+            ('j2', 150000, 0.95, 'c2')
+    RETURNING id`
+  );
 }
 
 async function commonBeforeEach() {

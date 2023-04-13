@@ -48,7 +48,7 @@ describe("POST /users", function () {
     });
   });
 
-  test("Fails for non-admins", async function () {
+  test("unauth for non-admins", async function () {
     const resp = await request(app)
       .post("/users")
       .send({
@@ -135,7 +135,7 @@ describe("GET /users", function () {
     });
   });
 
-  test("fails for non admin users", async function () {
+  test("unauth for non admin users", async function () {
     const resp = await request(app)
       .get("/users")
       .set("authorization", `Bearer ${u1Token}`);
@@ -307,8 +307,17 @@ describe("PATCH /users/:username", () => {
     const isSuccessful = await User.authenticate("u1", "new-password");
     expect(isSuccessful).toBeTruthy();
   });
-});
 
+  test("unauth for non authroized user with bad request data", async function () {
+    const resp = await request(app)
+      .patch(`/users/u2`)
+      .send({
+        firstName: 42,
+      })
+      .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toEqual(401);
+  });
+});
 /************************************** DELETE /users/:username */
 
 describe("DELETE /users/:username", function () {
@@ -326,7 +335,7 @@ describe("DELETE /users/:username", function () {
     expect(resp.body).toEqual({ deleted: "u1" });
   });
 
-  test("Fails when for user deletes another user", async function () {
+  test("unauth when for user deletes another user", async function () {
     const resp = await request(app)
       .delete(`/users/u3`)
       .set("authorization", `Bearer ${u1Token}`);

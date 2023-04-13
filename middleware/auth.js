@@ -37,9 +37,17 @@ function ensureLoggedIn(req, res, next) {
   return next();
 }
 
+/** Middleware to use when user logged in must be admin.
+ *
+ * If not, raises Unauthorized.
+ */
 function ensureAdminLoggedIn(req, res, next) {
-  if (!res.locals.user?.isAdmin) throw new UnauthorizedError();
-  return next();
+  if (res.locals.user && res.locals.user.isAdmin == true) {
+    return next();
+  }
+
+  throw new UnauthorizedError();
+
 }
 
 // function ensureCorrectUserOrAdmin(req, res, next) {
