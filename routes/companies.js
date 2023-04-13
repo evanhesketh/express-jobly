@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
-const { ensureLoggedIn } = require("../middleware/auth");
+const { ensureLoggedIn, ensureAdminLoggedIn } = require("../middleware/auth");
 const Company = require("../models/company");
 
 const companyNewSchema = require("../schemas/companyNew.json");
@@ -24,7 +24,7 @@ const router = new express.Router();
  * Authorization required: login
  */
 
-router.post("/", ensureLoggedIn, async function (req, res, next) {
+router.post("/", ensureAdminLoggedIn, async function (req, res, next) {
   const validator = jsonschema.validate(req.body, companyNewSchema, {
     required: true,
   });
@@ -52,32 +52,21 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  let { minEmployees, maxEmployees } = req.query;
-
-  // Create new object with all keys and values from the query string, and then pass it into the
-  // jsonschema validator.
-
-  if (minEmployees === " " || maxEmployees === " ") {
-    throw new BadRequestError(
-      "minEmployees and maxEmployees can not be an empty string."
-    );
-  }
-
-  if (minEmployees !== undefined) {
-    minEmployees = Number(minEmployees);
-    if (isNaN(minEmployees)) {
-      throw new BadRequestError("minEmployees must of type integer");
-    }
-  }
-  if (maxEmployees !== undefined) {
-    maxEmployees = Number(maxEmployees);
-    if (isNaN(maxEmployees)) {
-      throw new BadRequestError("maxEmployees must of type integer");
-    }
-  }
-
   if (Object.keys(req.query).length > 0) {
-    const validator = jsonschema.validate(req.query, companySearchSchema, {
+    const filterParams = {};
+
+    for (const key in req.query) {
+      if (key === 'minEmployees' || key === 'maxEmployees') {
+        if(req.query[key] === '') {
+          throw new BadRequestError('Must provide an integer input');
+        }
+        filterParams[key] = Number(req.query[key]);
+      } else {
+        filterParams[key] = req.query[key];
+      }
+    }
+
+    const validator = jsonschema.validate(filterParams, companySearchSchema, {
       required: true,
     });
 
@@ -85,7 +74,8 @@ router.get("/", async function (req, res, next) {
       const errs = validator.errors.map((e) => e.stack);
       throw new BadRequestError(errs);
     }
-    const companies = await Company.findByFilters(req.query);
+
+    const companies = await Company.findByFilters(filterParams);
 
     return res.json({ companies });
   }
@@ -119,7 +109,7 @@ router.get("/:handle", async function (req, res, next) {
  * Authorization required: login
  */
 
-router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
+router.patch("/:handle", ensureAdminLoggedIn, async function (req, res, next) {
   const validator = jsonschema.validate(req.body, companyUpdateSchema, {
     required: true,
   });
@@ -137,7 +127,7 @@ router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
  * Authorization: login
  */
 
-router.delete("/:handle", ensureLoggedIn, async function (req, res, next) {
+router.delete("/:handle", ensureAdminLoggedIn, async function (req, res, next) {
   await Company.remove(req.params.handle);
   return res.json({ deleted: req.params.handle });
 });

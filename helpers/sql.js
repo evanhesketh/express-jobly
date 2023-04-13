@@ -68,6 +68,7 @@ function sqlForFilteringCriteria(dataToFilterBy) {
   const maxEmployees = dataToFilterBy.maxEmployees;
   const filterCols = [];
   const values = [];
+  console.log("MIN EMPLOYEES", minEmployees)
 
   if (minEmployees > maxEmployees) {
     throw new BadRequestError("minEmployees must be less than maxEmployees");
