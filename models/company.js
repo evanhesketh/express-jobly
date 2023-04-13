@@ -77,7 +77,6 @@ class Company {
    */
   static async findByFilters(filters) {
     const { filterCols, values } = sqlForFilteringCriteria(filters);
-    console.log(filterCols, "TEST TEST TEST");
     const querySql = `SELECT handle,
               name,
               description,
@@ -88,7 +87,6 @@ class Company {
           ORDER BY name`;
 
     const result = await db.query(querySql, [...values]);
-    console.log(result, "RESULTTTT");
     const companies = result.rows;
 
     return companies;
