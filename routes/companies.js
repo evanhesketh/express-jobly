@@ -45,10 +45,34 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  * - maxEmployees
  * - nameLike (will find case-insensitive, partial matches)
  *
+ * Validates whether filters are submitted correctly, and converts minEmployees
+ * and maxEmployees into numbers to be passed to our filter helper function.
+ *
  * Authorization required: none
  */
 
 router.get("/", async function (req, res, next) {
+  let { minEmployees, maxEmployees } = req.query;
+
+  if (minEmployees === " " || maxEmployees === " ") {
+    throw new BadRequestError(
+      "minEmployees and maxEmployees can not be an empty string."
+    );
+  }
+
+  if (minEmployees !== undefined) {
+    minEmployees = Number(minEmployees);
+    if (isNaN(minEmployees)) {
+      throw new BadRequestError("minEmployees must of type integer");
+    }
+  }
+  if (maxEmployees !== undefined) {
+    maxEmployees = Number(maxEmployees);
+    if (isNaN(maxEmployees)) {
+      throw new BadRequestError("maxEmployees must of type integer");
+    }
+  }
+
   if (Object.keys(req.query).length > 0) {
     const validator = jsonschema.validate(req.query, companySearchSchema, {
       required: true,

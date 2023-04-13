@@ -62,6 +62,42 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
  *
  */
 
+function sqlForFilteringCriteria(dataToFilterBy) {
+  const name = dataToFilterBy.nameLike;
+  const minEmployees = dataToFilterBy.minEmployees;
+  const maxEmployees = dataToFilterBy.maxEmployees;
+  const filterCols = [];
+  const values = [];
+
+  if (minEmployees > maxEmployees) {
+    throw new BadRequestError("minEmployees must be less than maxEmployees");
+  }
+
+  if (name) {
+    filterCols.push(`"name" ILIKE `);
+    values.push(`%${name}%`);
+  }
+
+  if (minEmployees) {
+    filterCols.push(`"num_employees">=`);
+    values.push(minEmployees);
+  }
+
+  if (maxEmployees) {
+    filterCols.push(`"num_employees"<=`);
+    values.push(maxEmployees);
+  }
+
+  const filteredQuery = filterCols
+    .map((col, idx) => col + `$${idx + 1}`)
+    .join(" AND ");
+
+  return {
+    filterCols: filteredQuery,
+    values: [...values],
+  };
+}
+
 // function sqlForFilteringCriteria(dataToFilterBy) {
 //   const name = dataToFilterBy.nameLike || "";
 //   const minEmployees = dataToFilterBy.minEmployees || 0;
@@ -80,48 +116,6 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 //     values: [`%${name}%`, minEmployees, maxEmployees],
 //   };
 // }
-
-function sqlForFilteringCriteria(dataToFilterBy) {
-  const name = dataToFilterBy.nameLike;
-  const minEmployees = dataToFilterBy.minEmployees;
-  const maxEmployees = dataToFilterBy.maxEmployees;
-  const filterCols = [];
-  const values = [];
-
-  if (minEmployees > maxEmployees) {
-    throw new BadRequestError("minEmployees must be less than maxEmployees");
-  }
-
-  if (name) {
-    filterCols.push(`"name" ILIKE `);
-    values.push(`%${name}%`);
-  }
-
-  if (minEmployees) {
-    if (isNaN(Number(minEmployees))) {
-      throw new BadRequestError("MinEmployees must be of type integer");
-    }
-    filterCols.push(`"num_employees">=`);
-    values.push(minEmployees);
-  }
-
-  if (maxEmployees) {
-    if (isNaN(Number(maxEmployees))) {
-      throw new BadRequestError("maxEmployees must be of type integer");
-    }
-    filterCols.push(`"num_employees"<=`);
-    values.push(maxEmployees);
-  }
-
-  for (let i = 0; i < filterCols.length; i++) {
-    filterCols[i] += `$${i + 1}`;
-  }
-
-  return {
-    filterCols: filterCols.join(" AND "),
-    values: [...values],
-  };
-}
 
 // SELECT handle, name, description, num_employees AS "numEmployees", logo_url AS "logoUrl"
 // FROM companies

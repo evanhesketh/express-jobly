@@ -129,16 +129,36 @@ describe("GET /companies", function () {
     });
   });
 
+  test("fails when minEmployees is not a number", async function () {
+    const resp = await request(app).get("/companies/?minEmployees=test");
+    expect(resp.statusCode).toEqual(400);
+  });
+
+  test("fails when maxEmployees is not a number", async function () {
+    const resp = await request(app).get("/companies/?maxEmployees=test");
+    expect(resp.statusCode).toEqual(400);
+  });
+
+  test("fails when minEmployees is an empty string", async function () {
+    const resp = await request(app).get("/companies/?minEmployees=%20");
+    expect(resp.statusCode).toEqual(400);
+  });
+
+  test("fails when maxEmployees is an empty string", async function () {
+    const resp = await request(app).get("/companies/?maxEmployees=%20");
+    expect(resp.statusCode).toEqual(400);
+  });
+
   test("returns errors for invalid query parameters", async function () {
     const resp = await request(app).get("/companies/?invalidParam=notValid");
 
     expect(resp.body).toEqual({
-      "error": {
-        "message": [
-          "instance is not allowed to have the additional property \"invalidParam\""
+      error: {
+        message: [
+          'instance is not allowed to have the additional property "invalidParam"',
         ],
-        "status": 400
-      }
+        status: 400,
+      },
     });
   });
 
