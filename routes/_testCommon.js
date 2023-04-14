@@ -65,14 +65,14 @@ async function commonBeforeAll() {
     title: "j1",
     salary: 100000,
     equity: 0.98,
-    company_handle: "c1",
+    companyHandle: "c1",
   });
 
   const job2 = await Job.create({
     title: "j2",
     salary: 150000,
     equity: 0.95,
-    company_handle: "c2",
+    companyHandle: "c2",
   });
 
   jobIds["jobId1"] = job1.id;
@@ -101,4 +101,5 @@ module.exports = {
   commonAfterAll,
   u1Token,
   u3Token,
+  jobIds
 };

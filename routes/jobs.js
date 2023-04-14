@@ -25,6 +25,7 @@ const router = new express.Router();
  */
 
 router.post("/", ensureAdminLoggedIn, async function (req, res, next) {
+  console.log("HERE!!")
   const validator = jsonschema.validate(req.body, jobNewSchema, {
     required: true,
   });
@@ -32,7 +33,6 @@ router.post("/", ensureAdminLoggedIn, async function (req, res, next) {
     const errs = validator.errors.map((e) => e.stack);
     throw new BadRequestError(errs);
   }
-
   const job = await Job.create(req.body);
   return res.status(201).json({ job });
 });
@@ -56,7 +56,7 @@ router.get("/", async function (req, res, next) {
   if (Object.keys(req.query).length > 0) {
     const filterParams = {};
     //TODO: test this without the next code block
-
+    for (const key in req.query) {}
       if ("minSalary" in req.query) {
         if (req.query.minSalary !== "") {
           filterParams.minSalary = Number(req.query.minSalary);
@@ -68,12 +68,16 @@ router.get("/", async function (req, res, next) {
           filterParams.hasEquity = true;
         } else if (req.query.hasEquity.toLowerCase() === "false") {
           filterParams.hasEquity = false;
+        } else {
+          filterParams.hasEquity = req.query.hasEquity;
         }
       }
 
       if ("title" in req.query) {
         filterParams.title = req.query.title;
       }
+
+      console.log(filterParams, "filterParams")
 
       const validator = jsonschema.validate(filterParams, jobSearchSchema, {
         required: true,
