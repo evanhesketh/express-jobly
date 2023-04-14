@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const db = require("../db.js");
 const { BCRYPT_WORK_FACTOR } = require("../config");
 
+let jobIds = {};
+
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM companies");
@@ -30,26 +32,34 @@ async function commonBeforeAll() {
       await bcrypt.hash("password2", BCRYPT_WORK_FACTOR),
     ]
   );
-  //TODO: should we be returning something here???
   const results = await db.query(
     `
-    INSERT INTO jobs(title,
-                      salary,
-                      equity,
-                      company_handle)
-    VALUES ('j1', 100000, 0.98, 'c1'),
-            ('j2', 150000, 0.95, 'c2')
-    RETURNING id`
+  INSERT INTO jobs(title,
+                    salary,
+                    equity,
+                    company_handle)
+  VALUES ('j1', 100000, 0.98, 'c1'),
+          ('j2', 150000, 0.95, 'c2')
+          RETURNING id`
   );
-  const job1Id = result.rows[0].id;
-  const job2Id = results.rows[1].id;
+
+  // jobIds.push(results.rows[0].id);
+  // jobIds.push(results.rows[1].id);
+  jobIds["jobId1"] = results.rows[0].id;
+  jobIds["jobId2"] = results.rows[1].id;
 }
+
+// async function createTestJobs() {
+//   const results = console.log(results, "RESULTSSSS");
+//   return results.rows;
+// }
 
 async function commonBeforeEach() {
   await db.query("BEGIN");
 }
 
 async function commonAfterEach() {
+  // jobIds.length = 0;
   await db.query("ROLLBACK");
 }
 
@@ -62,4 +72,5 @@ module.exports = {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
+  jobIds,
 };
