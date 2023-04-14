@@ -67,7 +67,6 @@ class Job {
         WHERE ${filterCols}
         ORDER BY title`;
 
-    console.log(querySql, "THE QUERY SQL");
     console.log(values, "THE VALUES");
 
     const result = await db.query(querySql, values);

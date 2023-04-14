@@ -25,7 +25,7 @@ const router = new express.Router();
  */
 
 router.post("/", ensureAdminLoggedIn, async function (req, res, next) {
-  console.log("HERE!!")
+  console.log("HERE!!");
   const validator = jsonschema.validate(req.body, jobNewSchema, {
     required: true,
   });
@@ -53,51 +53,56 @@ router.post("/", ensureAdminLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
+  console.log(req.query, "THE QUERYYYY");
   if (Object.keys(req.query).length > 0) {
     const filterParams = {};
     //TODO: test this without the next code block
-    for (const key in req.query) {}
-      if ("minSalary" in req.query) {
+    for (const key in req.query) {
+      if (key === "minSalary") {
         if (req.query.minSalary !== "") {
           filterParams.minSalary = Number(req.query.minSalary);
         }
       }
 
-      if ("hasEquity" in req.query) {
+      if (key === "hasEquity") {
         if (req.query.hasEquity.toLowerCase() === "true") {
-          filterParams.hasEquity = true;
+          console.log("GOT HERE");
+          filterParams["hasEquity"] = true;
         } else if (req.query.hasEquity.toLowerCase() === "false") {
-          filterParams.hasEquity = false;
+          filterParams["hasEquity"] = false;
         } else {
-          filterParams.hasEquity = req.query.hasEquity;
+          filterParams["hasEquity"] = req.query.hasEquity;
         }
       }
-
-      if ("title" in req.query) {
+      if (key === "title") {
         filterParams.title = req.query.title;
       }
 
-      console.log(filterParams, "filterParams")
-
-      const validator = jsonschema.validate(filterParams, jobSearchSchema, {
-        required: true,
-      });
-
-      if (!validator.valid) {
-        const errs = validator.errors.map((e) => e.stack);
-        throw new BadRequestError(errs);
+      if (key !== "minSalary" && key !== "hasEquity" && key !== "title") {
+        filterParams[key] = req.query[key];
       }
-
-      const jobs = await Job.findByFilters(filterParams);
-
-      return res.json({ jobs });
     }
 
-    const jobs = await Job.findAll();
+    console.log(filterParams, "filterParams");
+
+    const validator = jsonschema.validate(filterParams, jobSearchSchema, {
+      required: true,
+    });
+
+    if (!validator.valid) {
+      const errs = validator.errors.map((e) => e.stack);
+      throw new BadRequestError(errs);
+    }
+
+    const jobs = await Job.findByFilters(filterParams);
 
     return res.json({ jobs });
   }
-);
+
+  const jobs = await Job.findAll();
+
+  return res.json({ jobs });
+});
 
 /** GET /[id]  =>  { job }
  *
