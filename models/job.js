@@ -117,7 +117,7 @@ class Job {
     const idVarIdx = "$" + (values.length + 1);
     let result;
     try {
-        querySql = `
+       const querySql = `
         UPDATE jobs
         SET ${setCols}
           WHERE id = ${idVarIdx}

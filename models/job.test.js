@@ -269,19 +269,19 @@ describe("update", function () {
 
 // /************************************** remove */
 
-// describe("remove", function () {
-//   test("works", async function () {
-//     await Job.remove(job2Id);
-//     const res = await db.query(`SELECT id FROM jobs WHERE id=${job2Id}`);
-//     expect(res.rows.length).toEqual(0);
-//   });
+describe("remove", function () {
+  test("works", async function () {
+    await Job.remove(jobIds.jobId2);
+    const res = await db.query(`SELECT id FROM jobs WHERE id=${jobIds.jobId2}`);
+    expect(res.rows.length).toEqual(0);
+  });
 
-//   test("not found if no such job", async function () {
-//     try {
-//       await Job.remove("nope");
-//       throw new Error("fail test, you shouldn't get here");
-//     } catch (err) {
-//       expect(err instanceof NotFoundError).toBeTruthy();
-//     }
-//   });
-// });
+  test("not found if no such job", async function () {
+    try {
+      await Job.remove(0);
+      throw new Error("fail test, you shouldn't get here");
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+});
