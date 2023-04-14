@@ -53,17 +53,18 @@ router.post("/", ensureAdminLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  console.log(req.query, "THE QUERYYYY");
+  //TODO: swap order of if/else
   if (Object.keys(req.query).length > 0) {
     const filterParams = {};
-    //TODO: test this without the next code block
+    // const filterParams = {...req.query};
+
     for (const key in req.query) {
       if (key === "minSalary") {
         if (req.query.minSalary !== "") {
           filterParams.minSalary = Number(req.query.minSalary);
         }
       }
-
+      //TODO: remove toLowerCase - don't help user here
       if (key === "hasEquity") {
         if (req.query.hasEquity.toLowerCase() === "true") {
           console.log("GOT HERE");

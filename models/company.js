@@ -49,7 +49,8 @@ class Company {
 
   /** Find all companies.
    *
-   * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
+   * Returns { handle, name, description, numEmployees, logoUrl, jobs }
+   *   where jobs is [{ id, title, salary, equity, companyHandle }, ...]
    * */
   static async findAll() {
     const companiesRes = await db.query(
@@ -86,7 +87,8 @@ class Company {
    *
    * Finds companies with filtering criteria.
    *
-   * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
+   *  Returns { handle, name, description, numEmployees, logoUrl, jobs }
+   *   where jobs is [{ id, title, salary, equity, companyHandle }, ...]
    *
    * TODO: question - prefer error, string, object to indicate no users found
    * TODO: can refactor and combine with findAll by passing in entire where clause in your
@@ -148,10 +150,10 @@ class Company {
     if (!company) throw new NotFoundError(`No company: ${handle}`);
 
     const jobRes = await db.query(
-      `SELECT id, 
+      `SELECT id,
               title,
-              salary, 
-              equity, 
+              salary,
+              equity,
               company_handle AS "companyHandle"
           FROM jobs
           WHERE company_handle = $1`,

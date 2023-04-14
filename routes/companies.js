@@ -38,7 +38,8 @@ router.post("/", ensureAdminLoggedIn, async function (req, res, next) {
 });
 
 /** GET /  =>
- *   { companies: [ { handle, name, description, numEmployees, logoUrl }, ...] }
+ *   Compananies are  {Companies: { handle, name, description, numEmployees, logoUrl, jobs }}
+ *   where jobs is [{ id, title, salary, equity }, ...]
  *
  * Can filter on provided search filters:
  * - minEmployees

@@ -21,13 +21,14 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
+//TODO: rename u3Token -> adminToken
 /************************************** POST /jobs */
 
 describe("POST /jobs", function () {
   const newJob = {
     title: "badJob",
     salary: 40000,
-    equity: 0.1,
+    equity: "0.1",
     companyHandle: "c1",
   };
 
@@ -164,17 +165,6 @@ describe("GET /jobs", function () {
       },
     });
   });
-  //TODO: IS THIS NECESSARY HERE????
-  // test("fails: test next() handler", async function () {
-  //   // there's no normal failure event which will cause this route to fail ---
-  //   // thus making it hard to test that the error-handler works with it. This
-  //   // should cause an error, all right :)
-  //   await db.query("DROP TABLE companies CASCADE");
-  //   const resp = await request(app)
-  //     .get("/jobs")
-  //     .set("authorization", `Bearer ${u1Token}`);
-  //   expect(resp.statusCode).toEqual(500);
-  // });
 });
 
 /************************************** GET /jobs/:id */

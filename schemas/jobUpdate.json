@@ -13,9 +13,7 @@
       "minimum": 0
     },
     "equity": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 1.0
+      "type": "string"
     }
   },
   "additionalProperties": false

@@ -23,14 +23,14 @@ afterAll(commonAfterAll);
 // const j2Id = await db.query(`
 // SELECT id from jobs
 // where title="j2"`);
-
+//TODO: change equity to strings
 /************************************** create */
 
 describe("create", function () {
   const newJob = {
     title: "new",
     salary: 90000,
-    equity: 0.9,
+    equity: "0.9",
     companyHandle: "c1",
   };
 
@@ -61,6 +61,22 @@ describe("create", function () {
       },
     ]);
   });
+
+  test("fails with invalid company handle", async function () {
+    const badJob = {
+      title: "bad",
+      salary: 50000,
+      equity: 0.02,
+      companyHandle: "nope"
+    };
+
+    try{
+      await Job.create(badJob);
+      throw new Error("You should not get here!");
+    } catch(err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  })
 });
 
 /************************************** findAll */
@@ -89,7 +105,7 @@ describe("findAll", function () {
     ]);
   });
 });
-
+//TODO: consider testing _SQLFor...
 /************************************** findByFilters */
 
 describe("findByFilters", function () {
@@ -111,7 +127,8 @@ describe("findByFilters", function () {
       },
     ]);
   });
-  test("Returns empty array if no matching jobs", async function () {
+  //TODO: put in job without equity
+  test("Ignores hasEquity if false", async function () {
     const filters = {
       title: "1",
       minSalary: 80000,
@@ -119,8 +136,26 @@ describe("findByFilters", function () {
     };
     const jobs = await Job.findByFilters(filters);
 
+    expect(jobs).toEqual([
+      {
+        id: jobIds.jobId1,
+        title: "j1",
+        salary: 100000,
+        equity: "0.98",
+        companyHandle: "c1",
+      }
+    ]);
+  });
+
+  test ("Returns empty array if no matching criteria", async function () {
+    const filters = {
+      title: "nope"
+    }
+
+    const jobs = await Job.findByFilters(filters);
     expect(jobs).toEqual([]);
   });
+
   test("Works if we only pass in certain parameters", async function () {
     const filters = {
       title: "j1",
@@ -169,7 +204,7 @@ describe("update", function () {
   const updateData = {
     title: "j2",
     salary: 200000,
-    equity: 0.95,
+    equity: "0.95",
     companyHandle: "c2",
   };
 
@@ -271,9 +306,13 @@ describe("update", function () {
 
 describe("remove", function () {
   test("works", async function () {
-    await Job.remove(jobIds.jobId2);
     const res = await db.query(`SELECT id FROM jobs WHERE id=${jobIds.jobId2}`);
-    expect(res.rows.length).toEqual(0);
+    expect(res.rows.length).toEqual(1);
+
+    await Job.remove(jobIds.jobId2);
+
+    const res2 = await db.query(`SELECT id FROM jobs WHERE id=${jobIds.jobId2}`);
+    expect(res2.rows.length).toEqual(0);
   });
 
   test("not found if no such job", async function () {

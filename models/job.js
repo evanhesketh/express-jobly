@@ -9,13 +9,27 @@ const { sqlForPartialUpdate } = require("../helpers/sql");
 class Job {
   /** Create a job (from data), update db, return new job data.
    *
-   * data should be { title, salary, equity, company_handle }
+   * data should be { title, salary, equity, companyHandle }
    *
-   * Returns { id, title, salary, equity, company_handle }
+   * Returns { id, title, salary, equity, companyHandle }
    *
+   * Throws BadRequestError if company handle is invalid.
    * */
 
   static async create({ title, salary, equity, companyHandle }) {
+    const companyRes = await db.query(
+      `SELECT name
+           FROM companies
+           WHERE handle = $1`,
+      [companyHandle]
+    );
+
+    const company = companyRes.rows[0];
+    if (!company) {
+      throw new BadRequestError(`Company handle does not exist: ${companyHandle}`);
+    }
+
+
     const result = await db.query(
       `INSERT INTO jobs(
           title,
@@ -153,7 +167,7 @@ class Job {
 
     if (!job) throw new NotFoundError(`No job: ${id}`);
   }
-
+//TODO: move up close to function that is using this
   static _sqlForFilteringJobs(dataToFilterBy) {
     const filterCols = [];
     const values = [];
@@ -166,9 +180,6 @@ class Job {
     if ("hasEquity" in dataToFilterBy) {
       if (dataToFilterBy.hasEquity === true) {
         filterCols.push(`"equity">`);
-        values.push(0);
-      } else {
-        filterCols.push(`"equity"=`);
         values.push(0);
       }
     }
