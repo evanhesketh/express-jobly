@@ -18,7 +18,7 @@ class Job {
   static async create({ title, salary, equity, companyHandle }) {
     const result = await db.query(
       `INSERT INTO jobs(
-          title, 
+          title,
           salary,
           equity,
           company_handle)
@@ -115,15 +115,20 @@ class Job {
       companyHandle: "company_handle",
     });
     const idVarIdx = "$" + (values.length + 1);
+    let result;
+    try {
+        querySql = `
+        UPDATE jobs
+        SET ${setCols}
+          WHERE id = ${idVarIdx}
+          RETURNING id, title, salary, equity, company_handle AS "companyHandle"`;
 
-    const querySql = `
-      UPDATE jobs
-      SET ${setCols}
-        WHERE id = ${idVarIdx}
-        RETURNING id, title, salary, equity, company_handle AS "companyHandle"`;
-    const result = await db.query(querySql, [...values, id]);
+        result = await db.query(querySql, [...values, id]);
+    } catch(err) {
+      throw new BadRequestError('Company handle does not exist')
+    }
+
     const job = result.rows[0];
-
     if (!job) throw new NotFoundError(`No job: ${id}`);
 
     return job;
