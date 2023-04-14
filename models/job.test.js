@@ -113,7 +113,7 @@ describe("findByFilters", function () {
   });
   test("Returns empty array if no matching jobs", async function () {
     const filters = {
-      title: "garbage",
+      title: "1",
       minSalary: 80000,
       hasEquity: false,
     };

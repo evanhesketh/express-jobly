@@ -149,7 +149,7 @@ class Job {
 
   static _sqlForFilteringJobs(dataToFilterBy) {
     const title = dataToFilterBy.title;
-    const equity = dataToFilterBy.equity;
+    const equity = dataToFilterBy.hasEquity;
     const minSalary = dataToFilterBy.minSalary;
     const filterCols = [];
     const values = [];
@@ -159,9 +159,15 @@ class Job {
       values.push(`%${title}%`);
     }
 
-    if (equity) {
-      filterCols.push(`"equity"=`);
-      values.push(equity);
+    if (equity === true || equity === false) {
+      console.log("YOU MADE IT!");
+      if (equity === true) {
+        filterCols.push(`"equity">=`);
+        values.push(0);
+      } else {
+        filterCols.push(`"equity"=`);
+        values.push(0);
+      }
     }
 
     if (minSalary) {
@@ -172,7 +178,7 @@ class Job {
     const filteredQuery = filterCols
       .map((col, idx) => col + `$${idx + 1}`)
       .join(" AND ");
-
+    console.log(filteredQuery, values, "QUERY and Values");
     return {
       filterCols: filteredQuery,
       values: values,
