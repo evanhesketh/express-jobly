@@ -66,11 +66,9 @@ router.get("/:username", ensureLoggedIn, async function (req, res, next) {
   ) {
     const user = await User.get(req.params.username);
     return res.json({ user });
-
   }
 
   throw new UnauthorizedError();
-
 });
 
 /** PATCH /[username] { user } => { user }
@@ -102,7 +100,6 @@ router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
   }
 
   throw new UnauthorizedError();
-
 });
 
 /** DELETE /[username]  =>  { deleted: username }
@@ -111,8 +108,6 @@ router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
  **/
 
 router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
-  console.log(res.locals.user, "USERRRR");
-  console.log(req.params.username, "USERNAME");
   if (
     res.locals.user.username === req.params.username ||
     res.locals.user.isAdmin === true
@@ -122,7 +117,28 @@ router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
   }
 
   throw new UnauthorizedError();
-
 });
+
+/** POST/[username]/jobs/[id]  =>  { applied: jobId }
+ *
+ * Authorization: LoggedIn
+ */
+
+router.post(
+  "/:username/jobs/:id",
+  ensureLoggedIn,
+  async function (req, res, next) {
+    if (
+      res.locals.user.username === req.params.username ||
+      res.locals.user.isAdmin === true
+    ) {
+      const jobId = await User.applyForJob(req.params.username, req.params.id);
+      return res.json({ applied: jobId });
+    }
+    throw new UnauthorizedError();
+  }
+);
+
+// /users/:username/jobs/:id
 
 module.exports = router;
