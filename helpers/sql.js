@@ -63,30 +63,26 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
  */
 
 function sqlForFilteringCriteria(dataToFilterBy) {
-  const name = dataToFilterBy.nameLike;
-  const minEmployees = dataToFilterBy.minEmployees;
-  const maxEmployees = dataToFilterBy.maxEmployees;
   const filterCols = [];
   const values = [];
-  console.log("MIN EMPLOYEES", minEmployees)
 
-  if (minEmployees > maxEmployees) {
+  if (dataToFilterBy.minEmployees > dataToFilterBy.maxEmployees) {
     throw new BadRequestError("minEmployees must be less than maxEmployees");
   }
 
-  if (name) {
+  if ("nameLike" in dataToFilterBy) {
     filterCols.push(`"name" ILIKE `);
-    values.push(`%${name}%`);
+    values.push(`%${dataToFilterBy.nameLike}%`);
   }
 
-  if (minEmployees) {
+  if ("minEmployees" in dataToFilterBy) {
     filterCols.push(`"num_employees">=`);
-    values.push(minEmployees);
+    values.push(dataToFilterBy.minEmployees);
   }
 
-  if (maxEmployees) {
+  if ("maxEmployees" in dataToFilterBy) {
     filterCols.push(`"num_employees"<=`);
-    values.push(maxEmployees);
+    values.push(dataToFilterBy.maxEmployees);
   }
 
   const filteredQuery = filterCols

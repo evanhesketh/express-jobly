@@ -67,6 +67,9 @@ class Job {
         WHERE ${filterCols}
         ORDER BY title`;
 
+    console.log(querySql, "THE QUERY SQL");
+    console.log(values, "THE VALUES");
+
     const result = await db.query(querySql, values);
     const jobs = result.rows;
 
@@ -117,15 +120,15 @@ class Job {
     const idVarIdx = "$" + (values.length + 1);
     let result;
     try {
-       const querySql = `
+      const querySql = `
         UPDATE jobs
         SET ${setCols}
           WHERE id = ${idVarIdx}
           RETURNING id, title, salary, equity, company_handle AS "companyHandle"`;
 
-        result = await db.query(querySql, [...values, id]);
-    } catch(err) {
-      throw new BadRequestError('Company handle does not exist')
+      result = await db.query(querySql, [...values, id]);
+    } catch (err) {
+      throw new BadRequestError("Company handle does not exist");
     }
 
     const job = result.rows[0];
@@ -153,21 +156,17 @@ class Job {
   }
 
   static _sqlForFilteringJobs(dataToFilterBy) {
-    const title = dataToFilterBy.title;
-    const equity = dataToFilterBy.hasEquity;
-    const minSalary = dataToFilterBy.minSalary;
     const filterCols = [];
     const values = [];
 
-    if (title) {
+    if ("title" in dataToFilterBy) {
       filterCols.push(`"title" ILIKE `);
-      values.push(`%${title}%`);
+      values.push(`%${dataToFilterBy.title}%`);
     }
 
-    if (equity === true || equity === false) {
-      console.log("YOU MADE IT!");
-      if (equity === true) {
-        filterCols.push(`"equity">=`);
+    if ("hasEquity" in dataToFilterBy) {
+      if (dataToFilterBy.hasEquity === true) {
+        filterCols.push(`"equity">`);
         values.push(0);
       } else {
         filterCols.push(`"equity"=`);
@@ -175,9 +174,9 @@ class Job {
       }
     }
 
-    if (minSalary) {
+    if ("minSalary" in dataToFilterBy) {
       filterCols.push(`"salary">=`);
-      values.push(minSalary);
+      values.push(dataToFilterBy.minSalary);
     }
 
     const filteredQuery = filterCols
