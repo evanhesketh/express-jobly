@@ -8,6 +8,7 @@ const {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
+  jobIds,
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -69,6 +70,15 @@ describe("findAll", function () {
         description: "Desc1",
         numEmployees: 1,
         logoUrl: "http://c1.img",
+        jobs: [
+          {
+            id: jobIds.jobId1,
+            title: "j1",
+            salary: 100000,
+            equity: "0.98",
+            companyHandle: "c1",
+          },
+        ],
       },
       {
         handle: "c2",
@@ -76,6 +86,15 @@ describe("findAll", function () {
         description: "Desc2",
         numEmployees: 2,
         logoUrl: "http://c2.img",
+        jobs: [
+          {
+            id: jobIds.jobId2,
+            title: "j2",
+            salary: 150000,
+            equity: "0.95",
+            companyHandle: "c2",
+          },
+        ],
       },
       {
         handle: "c3",
@@ -83,6 +102,7 @@ describe("findAll", function () {
         description: "Desc3",
         numEmployees: 3,
         logoUrl: "http://c3.img",
+        jobs: [],
       },
     ]);
   });
@@ -106,6 +126,7 @@ describe("findByFilters", function () {
         description: "Desc3",
         numEmployees: 3,
         logoUrl: "http://c3.img",
+        jobs: [],
       },
     ]);
   });
@@ -132,6 +153,15 @@ describe("findByFilters", function () {
         description: "Desc1",
         numEmployees: 1,
         logoUrl: "http://c1.img",
+        jobs: [
+          {
+            id: jobIds.jobId1,
+            title: "j1",
+            salary: 100000,
+            equity: "0.98",
+            companyHandle: "c1",
+          },
+        ],
       },
       {
         handle: "c2",
@@ -139,6 +169,15 @@ describe("findByFilters", function () {
         description: "Desc2",
         numEmployees: 2,
         logoUrl: "http://c2.img",
+        jobs: [
+          {
+            id: jobIds.jobId2,
+            title: "j2",
+            salary: 150000,
+            equity: "0.95",
+            companyHandle: "c2",
+          },
+        ],
       },
       {
         handle: "c3",
@@ -146,6 +185,7 @@ describe("findByFilters", function () {
         description: "Desc3",
         numEmployees: 3,
         logoUrl: "http://c3.img",
+        jobs: [],
       },
     ]);
   });
@@ -162,6 +202,15 @@ describe("get", function () {
       description: "Desc1",
       numEmployees: 1,
       logoUrl: "http://c1.img",
+      jobs: [
+        {
+          id: jobIds.jobId1,
+          title: "j1",
+          salary: 100000,
+          equity: "0.98",
+          companyHandle: "c1",
+        },
+      ],
     });
   });
 

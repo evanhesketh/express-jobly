@@ -61,6 +61,23 @@ class Company {
            FROM companies
            ORDER BY name`
     );
+
+    let companies = companiesRes.rows;
+
+    for (let company of companies) {
+      const jobRes = await db.query(
+        `SELECT id,
+                title,
+                salary,
+                equity,
+                company_handle AS "companyHandle"
+             FROM jobs
+             WHERE company_handle = $1`,
+        [company.handle]
+      );
+      company.jobs = jobRes.rows;
+    }
+
     return companiesRes.rows;
   }
 
@@ -89,6 +106,20 @@ class Company {
     const result = await db.query(querySql, [...values]);
     const companies = result.rows;
 
+    for (let company of companies) {
+      const jobRes = await db.query(
+        `SELECT id,
+                title,
+                salary,
+                equity,
+                company_handle AS "companyHandle"
+             FROM jobs
+             WHERE company_handle = $1`,
+        [company.handle]
+      );
+      company.jobs = jobRes.rows;
+    }
+
     return companies;
   }
 
@@ -115,6 +146,19 @@ class Company {
     const company = companyRes.rows[0];
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
+
+    const jobRes = await db.query(
+      `SELECT id, 
+              title,
+              salary, 
+              equity, 
+              company_handle AS "companyHandle"
+          FROM jobs
+          WHERE company_handle = $1`,
+      [handle]
+    );
+
+    company.jobs = jobRes.rows;
 
     return company;
   }
