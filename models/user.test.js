@@ -118,7 +118,7 @@ describe("findAll", function () {
         lastName: "U1L",
         email: "u1@email.com",
         isAdmin: false,
-        jobs: [jobIds.jobId1]
+        jobs: [jobIds.jobId1],
       },
       {
         username: "u2",
@@ -126,7 +126,7 @@ describe("findAll", function () {
         lastName: "U2L",
         email: "u2@email.com",
         isAdmin: false,
-        jobs: []
+        jobs: [],
       },
     ]);
   });
@@ -143,7 +143,7 @@ describe("get", function () {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: false,
-      jobs: [jobIds.jobId1]
+      jobs: [jobIds.jobId1],
     });
   });
 
@@ -236,8 +236,8 @@ describe("remove", function () {
 //TODO: test fails
 describe("apply", function () {
   test("Works", async function () {
-    const application = await User.applyForJob("u1", jobIds.jobId1);
-    expect(application).toEqual(jobIds.jobId1);
+    const application = await User.applyForJob("u1", jobIds.jobId2);
+    expect(application).toEqual(jobIds.jobId2);
   });
 
   test("Fails with invalid jobId", async function () {

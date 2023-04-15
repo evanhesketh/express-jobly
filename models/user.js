@@ -116,12 +116,11 @@ class User {
         `SELECT job_id AS "jobId"
             FROM applications
             WHERE username = $1`,
-            [user.username]
+        [user.username]
       );
 
-      const jobs = jobRes.rows.map(job => job.jobId);
+      const jobs = jobRes.rows.map((job) => job.jobId);
       user.jobs = jobs;
-
     }
 
     return result.rows;
@@ -155,10 +154,10 @@ class User {
       `SELECT job_id AS "jobId"
           FROM applications
           WHERE username = $1`,
-          [user.username]
+      [user.username]
     );
 
-    const jobs = jobRes.rows.map(job => job.jobId);
+    const jobs = jobRes.rows.map((job) => job.jobId);
     user.jobs = jobs;
 
     return user;
@@ -230,16 +229,32 @@ class User {
    * Throws badRequestError if job with corresponding jobId does not exist in the database.
    */
 
+  //   static async applyForJob(username, jobId) {
+  //     // try {
+  //     const result = await db.query(
+  //       `INSERT INTO applications
+  //             VALUES ($1, $2)
+  //             RETURNING job_id AS "jobId"`,
+  //       [username, jobId]
+  //     );
+  //     return result.rows[0].jobId;
+  //     // } catch (err) {
+  //     //   throw new NotFoundError("This jobId or username does not exist.");
+  //     // }
+  //   }
+  // }
+
   static async applyForJob(username, jobId) {
     try {
       const result = await db.query(
         `INSERT INTO applications
-            VALUES ($1, $2)
-            RETURNING job_id AS "jobId"`,
+          VALUES ($1, $2)
+          RETURNING job_id AS "jobId"`,
         [username, jobId]
       );
       return result.rows[0].jobId;
     } catch (err) {
+      console.log(err.message, "THE ERROR");
       throw new NotFoundError("This jobId or username does not exist.");
     }
   }

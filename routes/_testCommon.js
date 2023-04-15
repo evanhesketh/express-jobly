@@ -101,5 +101,5 @@ module.exports = {
   commonAfterAll,
   u1Token,
   u3Token,
-  jobIds
+  jobIds,
 };

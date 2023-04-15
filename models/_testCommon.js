@@ -6,6 +6,7 @@ const { BCRYPT_WORK_FACTOR } = require("../config");
 let jobIds = {};
 
 async function commonBeforeAll() {
+  await db.query("DELETE FROM applications");
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM companies");
   // noinspection SqlWithoutWhere
@@ -52,7 +53,6 @@ async function commonBeforeAll() {
     `INSERT INTO applications(username, job_id)
         VALUES ('u1', ${jobIds.jobId1} )`
   );
-
 }
 
 // async function createTestJobs() {
