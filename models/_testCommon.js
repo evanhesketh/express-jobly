@@ -47,6 +47,12 @@ async function commonBeforeAll() {
   // jobIds.push(results.rows[1].id);
   jobIds["jobId1"] = results.rows[0].id;
   jobIds["jobId2"] = results.rows[1].id;
+
+  await db.query(
+    `INSERT INTO applications(username, job_id)
+        VALUES ('u1', ${jobIds.jobId1} )`
+  );
+
 }
 
 // async function createTestJobs() {

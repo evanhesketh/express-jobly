@@ -111,6 +111,19 @@ class User {
            ORDER BY username`
     );
 
+    for (const user of result.rows) {
+      const jobRes = await db.query(
+        `SELECT job_id AS "jobId"
+            FROM applications
+            WHERE username = $1`,
+            [user.username]
+      );
+
+      const jobs = jobRes.rows.map(job => job.jobId);
+      user.jobs = jobs;
+
+    }
+
     return result.rows;
   }
 
@@ -137,6 +150,16 @@ class User {
     const user = userRes.rows[0];
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
+
+    const jobRes = await db.query(
+      `SELECT job_id AS "jobId"
+          FROM applications
+          WHERE username = $1`,
+          [user.username]
+    );
+
+    const jobs = jobRes.rows.map(job => job.jobId);
+    user.jobs = jobs;
 
     return user;
   }
@@ -170,9 +193,9 @@ class User {
     });
     const usernameVarIdx = "$" + (values.length + 1);
 
-    const querySql = `UPDATE users 
-                      SET ${setCols} 
-                      WHERE username = ${usernameVarIdx} 
+    const querySql = `UPDATE users
+                      SET ${setCols}
+                      WHERE username = ${usernameVarIdx}
                       RETURNING username,
                                 first_name AS "firstName",
                                 last_name AS "lastName",
